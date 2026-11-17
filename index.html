@@ -158,7 +158,7 @@ footer{color:var(--muted);font-size:12.5px;padding-block:20px 40px}
   <div class="grid">
     <section class="panel span-8">
       <h2 id="lb-title">Leaderboard: your weights</h2>
-      <p class="cap">Top 15 in view by composite score. Move the sliders to re-rank live. Click a bar to open the player.</p>
+      <p class="cap">Top 15 in view, in official order. Move the sliders to re-rank live by composite score. Click a bar to open the player.</p>
       <div class="legend" id="lb-legend"></div>
       <div class="chart" style="height:430px"><canvas id="c-lb" aria-label="Leaderboard bar chart" role="img"></canvas></div>
     </section>
@@ -280,7 +280,8 @@ class Dashboard {
     const grp = document.getElementById('f-grp').value, comp = document.getElementById('f-comp').value;
     const min = +document.getElementById('f-min').value, q = document.getElementById('f-q').value.trim().toLowerCase();
     const all = this.rows().map((r) => ({...r, s: this.score(r)}));
-    all.sort((a, b) => b.s - a.s).forEach((r, i) => { r.my = i + 1; });
+    const def = this.data.w[this.role], isDef = Object.keys(def).every((k) => Math.abs((this.weights[k] || 0) - def[k]) < 1e-9);
+    all.sort(isDef ? (a, b) => a.rank - b.rank : (a, b) => b.s - a.s).forEach((r, i) => { r.my = i + 1; });
     this.all = all;
     this.filtered = all.filter((r) => (grp === 'all' || r.grp === grp) && r.pballs >= min
       && (comp === 'all' || (comp === 'ipl' ? r.ipl >= 60 : r.ipl <= 40)) && (!q || r.name.toLowerCase().includes(q)));
